@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Author: Jack Stromberg <jackstromberg.com>
-# Last Updated: 2021-22-2
-# Version: 1.0
+# Last Updated: 2021-05-27
+# Version: 1.1
 # Description: This script will migrate the configuration of your Azure Load Balancer (Basic sku) to
 #               a new Azure Load Balancer (Standard sku) while persisting the public IP addresses associated
 #               to the frontend configurations of the load balancer.
