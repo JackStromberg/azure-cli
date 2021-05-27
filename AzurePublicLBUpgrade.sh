@@ -43,6 +43,12 @@ elif [ "$cleanUp" != "true" ] && [ "$cleanUp" != "false" ]; then
     exit "cleanUp parameter has an incorrect value.  The value should be set to true or false"
 fi
 
+if ! command -v jq &> /dev/null
+then
+    echo "Prerequisit failed: Please ensure the jq package is installed."
+    exit
+fi
+
 # No changed needed below
 newRgName=$oldRgName
 lb=$(az network lb show -g $oldRgName -n $oldLBName)
