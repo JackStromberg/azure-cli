@@ -2,7 +2,7 @@
 
 # Author: Jack Stromberg <jackstromberg.com>
 # Last Updated: 2021-06-15
-# Version: 1.2
+# Version: 1.3
 # Description: This script will migrate the configuration of your Azure Load Balancer (Basic sku) to
 #               a new Azure Load Balancer (Standard sku) while persisting the public IP addresses associated
 #               to the frontend configurations of the load balancer.
@@ -54,6 +54,10 @@ lb=$(az network lb show -g $oldRgName -n $oldLBName)
 if [[ -z $lb ]]; then
    # Load balancer doesn't exist; end script
    exit
+fi
+sku=$(echo $lb | jq -r '.sku.name')
+if [ "$sku" = "Standard" ]; then
+   exit "Load balancer is already on Standard sku. No need to proceed further."
 fi
 newLocation=$(echo $lb | jq -r '.location')
 
