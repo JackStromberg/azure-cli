@@ -49,15 +49,23 @@ then
     exit
 fi
 
-# No changed needed below
 newRgName=$oldRgName
 lb=$(az network lb show -g $oldRgName -n $oldLBName)
+if [[ -z $lb ]]; then
+   # Load balancer doesn't exist; end script
+	exit
+fi
 newLocation=$(echo $lb | jq -r '.location')
 
-# 1. Check if all frontends have static Public IPs
+# 1. Check if frontends have any public IPs and if they are static
 echo "Checking prerequisites..."
+numPublicFrontEnds=0
 for fe in $(jq -c '.frontendIpConfigurations[]' <<< $lb); do
     publicIpId=$(jq -r '.publicIpAddress.id' <<< $fe)
+    # check if public IP
+    if [ "$publicIpId" = null ]; then
+        continue
+    fi
     publicIpName=${publicIpId##*/}
     # Should probably split and check for RG name
 
@@ -67,8 +75,13 @@ for fe in $(jq -c '.frontendIpConfigurations[]' <<< $lb); do
     if [ "$publicIpAllocationMethod" = "Dynamic" ]; then
         exit "Please update IP address $publicIpName to be static"
     fi
-    
+    numPublicFrontEnds+=1
+
 done
+
+if [ "$numPublicFrontEnds" = 0 ]; then
+    exit 'Load balancer does not contain any frontend public IPs.  Exitting script.'
+fi
 
 # 2. Create new Standard LB
 echo "Creating new standard load balancer..."
