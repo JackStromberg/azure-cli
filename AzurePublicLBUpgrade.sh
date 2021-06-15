@@ -53,7 +53,7 @@ newRgName=$oldRgName
 lb=$(az network lb show -g $oldRgName -n $oldLBName)
 if [[ -z $lb ]]; then
    # Load balancer doesn't exist; end script
-	exit
+   exit
 fi
 newLocation=$(echo $lb | jq -r '.location')
 
